@@ -62,7 +62,7 @@ public class BookServiceImpl implements BookService {
 
 
     @Override
-    public Optional<Book> taken(String name) {
+    public Optional<Book> markAsTaken(String name) {
         Book book = this.bookRepository.findByName(name).orElseThrow(BookNotFoundException::new);
         Integer copies = book.getAvailableCopies()-1;
         book.setAvailableCopies(copies);

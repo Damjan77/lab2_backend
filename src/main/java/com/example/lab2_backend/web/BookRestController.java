@@ -16,9 +16,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
 @RestController
-@CrossOrigin(origins = "https://emtlibrary.herokuapp.com/")
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api")
 public class BookRestController {
     private final BookService bookService;
@@ -54,20 +53,20 @@ public class BookRestController {
     @PostMapping("/mark/{id}")
     public ResponseEntity<Book> markAsTaken(@PathVariable Long id){
         Book book = this.bookService.findById(id).orElseThrow(BookNotFoundException::new);
-        return this.bookService.taken(book.getName()).map(book1 -> ResponseEntity.ok().body(book1))
+        return this.bookService.markAsTaken(book.getName()).map(book1 -> ResponseEntity.ok().body(book1))
+                .orElseGet(() -> ResponseEntity.badRequest().build());
+    }
+
+    @PostMapping("/edit/{id}")
+    public ResponseEntity<Book> editBook(@PathVariable Long id, @RequestBody BookDto bookDto) {
+        return this.bookService.editBook(id, bookDto.getName(), bookDto.getCategory(), bookDto.getAuthor(), bookDto.getAvailableCopies())
+                .map(book -> ResponseEntity.ok().body(book))
                 .orElseGet(() -> ResponseEntity.badRequest().build());
     }
 
     @PostMapping("/add")
     public ResponseEntity<Book> addBook(@RequestBody BookDto bookDto) {
         return this.bookService.addBook(bookDto.getName(), bookDto.getCategory(), bookDto.getAuthor(), bookDto.getAvailableCopies())
-                .map(book -> ResponseEntity.ok().body(book))
-                .orElseGet(() -> ResponseEntity.badRequest().build());
-    }
-
-    @PutMapping("/edit/{id}")
-    public ResponseEntity<Book> editBook(@PathVariable Long id, @RequestBody BookDto bookDto) {
-        return this.bookService.editBook(id, bookDto.getName(), bookDto.getCategory(), bookDto.getAuthor(), bookDto.getAvailableCopies())
                 .map(book -> ResponseEntity.ok().body(book))
                 .orElseGet(() -> ResponseEntity.badRequest().build());
     }
